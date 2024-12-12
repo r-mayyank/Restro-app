@@ -1,10 +1,13 @@
-import { Router } from "express";
+import { Hono } from "hono";
+import { getCategories, createCategory } from "../controllers/categorycontrollers.js";
 
-const router = Router()
+const categoryRouter = new Hono<{
+    Bindings: {
+      DATABASE_URL:string 
+    }
+  }>();
 
-import {getCategories,createCategory} from "../controllers/categorycontrollers.js"
+categoryRouter.get("/", getCategories);
+categoryRouter.post("/", createCategory);
 
-router.get('/',getCategories);
-router.post("/",createCategory);
-
-export default router;
+export default categoryRouter;

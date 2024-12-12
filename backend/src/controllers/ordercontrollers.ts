@@ -1,32 +1,28 @@
-import { Request, Response, RequestHandler } from "express";
-import { Customer } from "@prisma/client";
-import prisma from "../config/prisma.js";
+import { Context } from "hono";
+import { Customer } from "@prisma/client/edge";
+import prisma from "../config/prisma";
+
 const { customer: _customer, order, orderItem } = prisma;
 
-export const createOrder: RequestHandler = async (req, res): Promise<void> => {
-  const { customerId, customerName, customerPhone, type, orderItems, status } = req.body;
-  console.log("Received order data:", req.body);
+// Create Order
+export const createOrder = async (c: Context): Promise<Response> => {
+  const { customerId, customerName, customerPhone, type, orderItems, status } = await c.req.json();
+  console.log("Received order data:", { customerId, customerName, customerPhone, type, orderItems, status });
 
   try {
     let customer: Customer | null;
 
     if (customerId) {
-      customer = await _customer.findUnique({
-        where: { id: customerId },
-      });
+      customer = await _customer.findUnique({ where: { id: customerId } });
 
       if (!customer) {
-        res.status(404).json({ error: "Customer not found." });
-        return; // Ensure the function doesn't continue
+        return c.json({ error: "Customer not found." }, 404);
       }
     } else {
       customer = await _customer.upsert({
         where: { phone: customerPhone },
         update: { name: customerName },
-        create: {
-          name: customerName,
-          phone: customerPhone,
-        },
+        create: { name: customerName, phone: customerPhone },
       });
     }
 
@@ -48,21 +44,20 @@ export const createOrder: RequestHandler = async (req, res): Promise<void> => {
       },
     });
 
-    res.status(201).json(newOrder);
+    return c.json(newOrder, 201);
   } catch (error: any) {
     console.error("Error creating order:", error);
     if (error.code === "P2002") {
-      res.status(409).json({ error: "A customer with this phone number already exists." });
-    } else {
-      res.status(500).json({ error: "An error occurred while creating the order." });
+      return c.json({ error: "A customer with this phone number already exists." }, 409);
     }
+    return c.json({ error: "An error occurred while creating the order." }, 500);
   }
 };
 
-// Similarly, add `Promise<void>` return type and ensure response is always ended
-export const updateOrder: RequestHandler = async (req, res): Promise<void> => {
-  const { id } = req.params;
-  const { type, status, orderItems } = req.body;
+// Update Order
+export const updateOrder = async (c: Context): Promise<Response> => {
+  const id = c.req.param("id");
+  const { type, status, orderItems } = await c.req.json();
 
   try {
     const existingOrder = await order.findUnique({
@@ -71,8 +66,7 @@ export const updateOrder: RequestHandler = async (req, res): Promise<void> => {
     });
 
     if (!existingOrder) {
-      res.status(404).json({ error: "Order not found." });
-      return;
+      return c.json({ error: "Order not found." }, 404);
     }
 
     if (orderItems) {
@@ -99,30 +93,30 @@ export const updateOrder: RequestHandler = async (req, res): Promise<void> => {
       },
     });
 
-    res.status(200).json(updatedOrder);
+    return c.json(updatedOrder, 200);
   } catch (error: any) {
     console.error("Error updating order:", error);
-    res.status(500).json({ error: "An error occurred while updating the order." });
+    return c.json({ error: "An error occurred while updating the order." }, 500);
   }
 };
 
-export const deleteOrder: RequestHandler = async (req, res): Promise<void> => {
-  const { id } = req.params;
+// Delete Order
+export const deleteOrder = async (c: Context): Promise<Response> => {
+  const id = c.req.param("id");
 
   try {
     const existingOrder = await order.findUnique({ where: { id } });
 
     if (!existingOrder) {
-      res.status(404).json({ error: "Order not found." });
-      return;
+      return c.json({ error: "Order not found." }, 404);
     }
 
     await orderItem.deleteMany({ where: { id } });
     await order.delete({ where: { id } });
 
-    res.status(200).json({ message: "Order deleted successfully." });
+    return c.json({ message: "Order deleted successfully." }, 200);
   } catch (error: any) {
     console.error("Error deleting order:", error);
-    res.status(500).json({ error: "An error occurred while deleting the order." });
+    return c.json({ error: "An error occurred while deleting the order." }, 500);
   }
 };

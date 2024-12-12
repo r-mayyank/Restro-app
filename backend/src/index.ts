@@ -2,11 +2,11 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import user from './routes/user'
 import attendance from './routes/attendance'
-
-import menuroutes from './routes/menuroutes.js';
-import categoryroutes from './routes/categoryroutes.js';
-import customerroutes from './routes/customerroutes.js';
-import orderroutes from './routes/orderroutes.js';
+import menurouter from './routes/menuroutes'
+import categoryRouter from './routes/categoryroutes'
+import customerrouter from './routes/customerroutes'
+import orderrouter from './routes/orderroutes'
+import restaurant from './routes/restaurant'
 
 const app = new Hono()
 
@@ -18,9 +18,10 @@ app.get('/health', (c) => {
 
 app.route('/api/v1/user', user)
 app.route('/api/v1/user/attendance', attendance)
-app.use('/api/menu-items', menuroutes);
-app.use('/api/categories', categoryroutes);
-app.use('/api/customers', customerroutes);
-app.use('/api/orders', orderroutes);
+app.route('/api/v1/restaurant', restaurant)
+app.route("/api/menu-items", menurouter);
+app.route("/api/categories", categoryRouter);
+app.route("/api/customers", customerrouter);
+app.route("/api/orders", orderrouter);
 
 export default app;

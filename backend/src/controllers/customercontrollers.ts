@@ -1,34 +1,41 @@
-//import customer from "../config/prisma.js";
-import prisma from "../config/prisma.js";
-const {customer} = prisma;
-import { Request,Response } from "express";
+import prisma from '../config/prisma';
+import { Context } from 'hono';
+
+const { customer } = prisma;
 
 // GET all customers
-export async function getCustomers(req: Request, res: Response) : Promise<void>{
+export async function getCustomers(c: Context): Promise<Response> {
   try {
-    console.log("tryna find all customers");
+    console.log('Trying to find all customers');
     const customers = await customer.findMany(); // Fetch customers
-    console.log("customers--------------> ", customers);
+    console.log('customers--------------> ', customers);
 
-    res.status(200).json(customers); // Return customers as JSON
+    return c.json(customers, 200); // Return customers as JSON
   } catch (error) {
-    console.error("Error fetching customers:", error);
-    res.status(500).json({ error: "Error fetching customers" });
+    console.error('Error fetching customers:', error);
+    return c.json({ error: 'Error fetching customers' }, 500);
   }
 }
 
-export async function createCustomer(req: Request, res: Response) :Promise<void> {
+// Create a new customer
+export async function createCustomer(c: Context): Promise<Response> {
   try {
-    const { name, phone } = req.body;
-    const newcustomer = await customer.create({
+    const body = await c.req.json(); // Extract request body
+    const { name, phone } = body;
+
+    if (!name || !phone) {
+      return c.json({ error: 'Name and phone are required.' }, 400);
+    }
+
+    const newCustomer = await customer.create({
       data: {
         name: name,
         phone: phone,
       },
     });
-    res.status(201).json(newcustomer);
-  } catch (e) {
-    console.log("some error occured while creating customer", e);
-    res.status(500).json("some eroor");
+    return c.json(newCustomer, 201); // Return the newly created customer
+  } catch (error) {
+    console.log('An error occurred while creating customer:', error);
+    return c.json({ error: 'An error occurred while creating customer' }, 500);
   }
 }

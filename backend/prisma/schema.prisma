@@ -14,26 +14,27 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
-  name       String
-  password   String
-  phoneNo    String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  role       String
-  addedBy    User?    @relation("AddedBy", fields: [addedById], references: [id])
-  addedById  Int?
-  addedUsers User[]   @relation("AddedBy")
-  attendance Attendance[]
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  name        String
+  password    String
+  phoneNo     String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  role        String
+  restaurants Restaurant[]
+  addedBy     User?        @relation("AddedBy", fields: [addedById], references: [id])
+  addedById   Int?
+  addedUsers  User[]       @relation("AddedBy")
+  attendance  Attendance[]
 }
 
 model Attendance {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id])
-  date       String
-  status     Status   // Enum or String, e.g., 'Present', 'Absent', etc.
+  id     Int    @id @default(autoincrement())
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  date   String
+  status Status // Enum or String, e.g., 'Present', 'Absent', etc.
 }
 
 enum Status {
@@ -54,22 +55,55 @@ enum Roles {
   USER
 }
 
+model Restaurant {
+  id        Int        @id @default(autoincrement())
+  name      String
+  phoneNo   String?
+  address   String
+  type      String //Dine in takeaway both
+  licenseNo String
+  ownerId   Int
+  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  tables    Table[] // Stores tables information in the desired JSON format
+  menu      MenuItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Table {
+  id           Int         @id @default(autoincrement())
+  tno          Int
+  capacity     Int
+  available    Boolean
+  status       TableStatus
+  restaurantId Int
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+}
+
+enum TableStatus {
+  available
+  unavailable
+  reserved
+}
+
 model MenuItem {
-  id            String         @id @default(uuid()) @map("_id") @db.Uuid
-  itemName      String         @unique
-  available      Boolean
-  category      Category       @relation(fields: [categoryId], references: [id])
-  categoryId    String         @db.Uuid  // Ensure this uses @db.Uuid
-  priceOptions  PriceOption[]  // Relation to price options
-  orderItems    OrderItem[] 
+  id           String        @id @default(uuid()) @map("_id") @db.Uuid
+  restaurantId Int
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  itemName     String        @unique
+  available    Boolean
+  category     Category      @relation(fields: [categoryId], references: [id])
+  categoryId   String        @db.Uuid // Ensure this uses @db.Uuid
+  priceOptions PriceOption[] // Relation to price options
+  orderItems   OrderItem[]
 }
 
 model PriceOption {
-  id         String  @id @default(uuid()) @map("_id") @db.Uuid
-  size       String  // e.g., "half", "full", "small", "medium", "large"
+  id         String   @id @default(uuid()) @map("_id") @db.Uuid
+  size       String // e.g., "half", "full", "small", "medium", "large"
   price      Float
   menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
-  menuItemId String @db.Uuid  // Ensure this uses @db.Uuid
+  menuItemId String   @db.Uuid // Ensure this uses @db.Uuid
 }
 
 model Category {
@@ -79,14 +113,14 @@ model Category {
 }
 
 model Order {
-  id          String       @id @default(uuid()) @map("_id") @db.Uuid
-  type        OrderType    // DineIn or Takeaway
-  customer    Customer?    @relation(fields: [customerId], references: [id])
-  customerId  String?      @db.Uuid
-  orderItems  OrderItem[]  // Relation to order items
-  status      OrderStatus   // ongoing or complete
-  createdAt   DateTime     @default(now())  // Track when the order was created
-  updatedAt   DateTime     @updatedAt  // Track when the order was last updated
+  id         String      @id @default(uuid()) @map("_id") @db.Uuid
+  type       OrderType // DineIn or Takeaway
+  customer   Customer?   @relation(fields: [customerId], references: [id])
+  customerId String?     @db.Uuid
+  orderItems OrderItem[] // Relation to order items
+  status     OrderStatus // ongoing or complete
+  createdAt  DateTime    @default(now()) // Track when the order was created
+  updatedAt  DateTime    @updatedAt // Track when the order was last updated
 }
 
 // Enum for Order Types
@@ -105,31 +139,14 @@ model OrderItem {
   id         String   @id @default(uuid()) @map("_id") @db.Uuid
   menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
   menuItemId String   @db.Uuid
-  quantity   Int      // Quantity of the menu item ordered
+  quantity   Int // Quantity of the menu item ordered
   order      Order    @relation(fields: [orderId], references: [id])
-  orderId    String   @db.Uuid         // Relation to Order
+  orderId    String   @db.Uuid // Relation to Order
 }
-
 
 model Customer {
-  id        String   @id @default(uuid()) @map("_id") @db.Uuid
-  name      String   // Name of the customer
-  phone     String   @unique // Phone number must be unique
-  orders    Order[]  // Relation to the orders placed by the customer
-  
-}
-
-enum TableStatus {
-  available
-  unavailable
-  reserved
-}
-
-
-model Table {
-  id String @id @default(uuid()) @map("_id") @db.Uuid
-  tno     Int @unique
-  capacity Int
-  available  Boolean
-  status TableStatus
+  id     String  @id @default(uuid()) @map("_id") @db.Uuid
+  name   String // Name of the customer
+  phone  String  @unique // Phone number must be unique
+  orders Order[] // Relation to the orders placed by the customer
 }

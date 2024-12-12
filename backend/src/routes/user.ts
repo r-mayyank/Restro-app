@@ -35,9 +35,9 @@ user.post('/signup', async (c) => {
         }
     })
 
-    const jwt = await sign({ userId: user.id, email: user.email }, c.env.JWT_SECRET)
+    const jwt = await sign({ userId: user.id, email: user.email, role: user.role }, c.env.JWT_SECRET)
 
-    return c.json({ jwt });
+    return c.json({ jwt, userId: user.id });
 })
 
 user.post('/signin', async (c) => {
@@ -65,7 +65,7 @@ user.post('/signin', async (c) => {
         return c.text('Invalid credentials');
     }
 
-    const jwt = await sign({ userId: users.id, email: users.email }, c.env.JWT_SECRET)
+    const jwt = await sign({ userId: users.id, email: users.email, role: users.role }, c.env.JWT_SECRET)
 
     return c.json({ jwt });
 })

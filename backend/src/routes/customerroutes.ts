@@ -1,9 +1,14 @@
-import { Router } from "express";
-const router = Router();
+import { Hono } from "hono";
+const customerrouter= new Hono<{
+    Bindings: {
+      DATABASE_URL:string 
+    }
+  }>();
+
 
 import { getCustomers, createCustomer } from "../controllers/customercontrollers.js";
 
-router.get('/',getCustomers);
-router.post('/',createCustomer);
+customerrouter.get('/',getCustomers);
+customerrouter.post('/',createCustomer);
 
-export default router;
+export default customerrouter;

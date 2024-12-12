@@ -1,5 +1,4 @@
 
-
 export const HomeCard = ({ title, navi }: { title: string, navi: string }) => {
     return <div className="rounded shadow-md p-5 grid h-min gap-y-4 bg-[#FAFAFA]">
         <div className="flex justify-between items-center">

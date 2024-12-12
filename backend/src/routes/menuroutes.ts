@@ -1,12 +1,17 @@
-import { Router } from 'express';
+import { Hono } from 'hono';
 import { getMenuItem, createMenuItem, deleteMenuItem, updateMenuItem } from '../controllers/menucontrollers.js';
-const router = Router();
+
+const menurouter = new Hono<{
+    Bindings: {
+      DATABASE_URL:string 
+    }
+  }>();
 
 // Route for creating a new menu item
-router.get('/',getMenuItem);
-router.post('/', createMenuItem);
-router.delete('/:id',deleteMenuItem);
-router.put('/:id',updateMenuItem);
+menurouter.get('/',getMenuItem);
+menurouter.post('/', createMenuItem);
+menurouter.delete('/:id',deleteMenuItem);
+menurouter.put('/:id',updateMenuItem);
 
 
-export default router;
+export default menurouter;

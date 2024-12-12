@@ -1,10 +1,15 @@
-import { Router } from 'express';
-const router = Router();
+import { Hono } from "hono";
+
+const orderrouter = new Hono<{
+    Bindings: {
+      DATABASE_URL:string 
+    }
+  }>();
 
 import {createOrder,updateOrder,deleteOrder} from "../controllers/ordercontrollers.js"
 
-router.post('/',createOrder);
-router.put('/:orderId',updateOrder);
-router.delete('/:orderId',deleteOrder);
+orderrouter.post('/',createOrder);
+orderrouter.put('/:orderId',updateOrder);
+orderrouter.delete('/:orderId',deleteOrder);
 
-export default router;
+export default orderrouter;
