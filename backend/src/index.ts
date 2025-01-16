@@ -7,6 +7,8 @@ import categoryRouter from './routes/categoryroutes'
 import customerrouter from './routes/customerroutes'
 import orderrouter from './routes/orderroutes'
 import restaurant from './routes/restaurant'
+import table from './routes/table'
+import kot from './controllers/kotcontrollers'
 
 const app = new Hono()
 
@@ -19,6 +21,8 @@ app.get('/health', (c) => {
 app.route('/api/v1/user', user)
 app.route('/api/v1/user/attendance', attendance)
 app.route('/api/v1/restaurant', restaurant)
+app.route('/api/v1/table', table)
+app.route('/api/v1/kot', kot)
 app.route("/api/menu-items", menurouter);
 app.route("/api/categories", categoryRouter);
 app.route("/api/customers", customerrouter);

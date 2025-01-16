@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Trash2 } from 'lucide-react'
+import { TopBar } from '../TopBar'
 
 interface MenuItem {
   id: string

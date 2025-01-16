@@ -83,12 +83,12 @@ export const Auth = ({ type }: { type: "signin" | "signup" }) => {
                                 email: e.target.value
                             }))
                         }} />
-                        <LabelledInput label={"Phone Number"} placeholder="934xxxx738" onChange={(e) => {
+                        {type === "signup" ? <LabelledInput label={"Phone Number"} placeholder="934xxxx738" onChange={(e) => {
                             setPostInputs(c => ({
                                 ...c,
                                 phoneNo: e.target.value
                             }))
-                        }} />
+                        }} /> : null}
                         <LabelledInput label={"Password"} type="password" onChange={(e) => {
                             setPostInputs(c => ({
                                 ...c,
@@ -100,7 +100,7 @@ export const Auth = ({ type }: { type: "signin" | "signup" }) => {
 
                     <div>
 
-                        <form className="max-w-full pr-2 mx-auto">
+                    {type === "signup" ? <form className="max-w-full pr-2 mx-auto">
                             <label htmlFor="roles" className="block mb-2 text-md font-bold text-gray-900 pt-3 ">User role</label>
                             <select id="roles" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black hover:ring-black block w-full p-2.5" value={postInputs.role} onChange={(e) => setPostInputs({
                                 ...postInputs,
@@ -112,7 +112,7 @@ export const Auth = ({ type }: { type: "signin" | "signup" }) => {
                                 <option value="cook">Cook</option>
                                 <option value="user">User</option>
                             </select>
-                        </form>
+                        </form> : null}
 
                     </div>
 

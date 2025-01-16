@@ -5,14 +5,14 @@ import { AdminTableDialog } from './admin-table-dialog'
 import { Button } from '@/components/ui/button'
 
 const initialTables: Table[] = [
-  { id: 1, number: 1, status: 'empty', capacity: 2 },
-  { id: 2, number: 2, status: 'occupied', capacity: 4 },
-  { id: 3, number: 3, status: 'reserved', capacity: 6 },
-  { id: 4, number: 4, status: 'empty', capacity: 2 },
-  { id: 5, number: 5, status: 'occupied', capacity: 4 },
-  { id: 6, number: 6, status: 'empty', capacity: 6 },
-  { id: 7, number: 7, status: 'reserved', capacity: 8 },
-  { id: 8, number: 8, status: 'empty', capacity: 4 },
+  { id: 1, number: 1, status: 'empty', capacity: 2, availability: 'available' },
+  { id: 2, number: 2, status: 'occupied', capacity: 4, availability: 'available'  },
+  { id: 3, number: 3, status: 'reserved', capacity: 6, availability: 'available'  },
+  { id: 4, number: 4, status: 'empty', capacity: 2, availability: 'available'  },
+  { id: 5, number: 5, status: 'occupied', capacity: 4, availability: 'available'  },
+  { id: 6, number: 6, status: 'empty', capacity: 6, availability: 'available'  },
+  { id: 7, number: 7, status: 'reserved', capacity: 8, availability: 'available'  },
+  { id: 8, number: 8, status: 'empty', capacity: 4, availability: 'available'  },
 ]
 
 export function AdminTableLayout() {

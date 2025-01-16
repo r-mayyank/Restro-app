@@ -22,6 +22,7 @@ model User {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   role        String
+  salary      Int?
   restaurants Restaurant[]
   addedBy     User?        @relation("AddedBy", fields: [addedById], references: [id])
   addedById   Int?
@@ -60,6 +61,7 @@ model Restaurant {
   name      String
   phoneNo   String?
   address   String
+  country   String
   type      String //Dine in takeaway both
   licenseNo String
   ownerId   Int
@@ -71,18 +73,25 @@ model Restaurant {
 }
 
 model Table {
-  id           Int         @id @default(autoincrement())
+  id           Int         @id @unique @default(autoincrement())
   tno          Int
   capacity     Int
-  available    Boolean
+  available    TableAvailability
   status       TableStatus
   restaurantId Int
   restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  orders       Order[] // Add this line to create the opposite relation field
+  KOTs         KOTs[]
+}
+
+enum TableAvailability {
+  available
+  unavailable
 }
 
 enum TableStatus {
-  available
-  unavailable
+  empty
+  occupied
   reserved
 }
 
@@ -118,9 +127,22 @@ model Order {
   customer   Customer?   @relation(fields: [customerId], references: [id])
   customerId String?     @db.Uuid
   orderItems OrderItem[] // Relation to order items
+  KOTs       KOTs[] // Relation to KOTs
   status     OrderStatus // ongoing or complete
   createdAt  DateTime    @default(now()) // Track when the order was created
   updatedAt  DateTime    @updatedAt // Track when the order was last updated
+  tableId    Int? // Relation to Table
+  table      Table?      @relation(fields: [tableId], references: [id])
+}
+
+model KOTs {
+  id         String      @id @default(uuid()) @map("_id") @db.Uuid
+  order      Order       @relation(fields: [orderId], references: [id])
+  orderId    String      @db.Uuid
+  status     OrderStatus
+  orderItems OrderItem[]
+  table      Table?      @relation(fields: [tableId], references: [id])
+  tableId    Int?
 }
 
 // Enum for Order Types
@@ -142,6 +164,8 @@ model OrderItem {
   quantity   Int // Quantity of the menu item ordered
   order      Order    @relation(fields: [orderId], references: [id])
   orderId    String   @db.Uuid // Relation to Order
+  kot        KOTs?    @relation(fields: [kotId], references: [id])
+  kotId      String?  @db.Uuid
 }
 
 model Customer {

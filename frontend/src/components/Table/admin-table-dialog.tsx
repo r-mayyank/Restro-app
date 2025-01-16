@@ -1,4 +1,4 @@
-import { Table, TableStatus } from '../../types/table'
+import { Table, TableAvailability, TableStatus } from '../../types/table'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -36,6 +36,7 @@ export function AdminTableDialog({
 }: AdminTableDialogProps) {
   const [status, setStatus] = useState<TableStatus>(table?.status || 'empty')
   const [capacity, setCapacity] = useState(table?.capacity || 2)
+  const [availability, setAvailability] = useState<TableAvailability>(table?.availability || 'available')
 
   useEffect(() => {
     if (table) {
@@ -50,9 +51,9 @@ export function AdminTableDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (isAddingTable) {
-      onAddTable({ status, capacity })
+      onAddTable({ status, capacity, availability })
     } else if (table) {
-      onTableUpdate(table.id, { status, capacity })
+      onTableUpdate(table.id, { status, capacity, availability })
     }
     onOpenChange(false)
   }
@@ -87,6 +88,18 @@ export function AdminTableDialog({
               onChange={(e) => setCapacity(parseInt(e.target.value, 10))}
               required
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="status">Availability</Label>
+            <Select onValueChange={(value: TableAvailability) => setAvailability(value)} value={availability}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Availability" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="available">Available</SelectItem>
+                <SelectItem value="unavailable">Unavailable</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <Button type="submit" className="w-full">
             {isAddingTable ? 'Add Table' : 'Update Table'}

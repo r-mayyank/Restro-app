@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
+import { logger } from "hono/logger";
 
 const restaurant = new Hono<{
     Bindings: {
@@ -15,14 +16,19 @@ restaurant.post('/create', async (c) => {
     }).$extends(withAccelerate());
 
     const body = await c.req.json();
+    console.log("Received restaurant data:", body);
 
     const restaurant = await prisma.restaurant.create({
         data: {
             name: body.name,
             address: body.address,
+            country: body.country,
             phoneNo: body.phoneNo,
-            ownerId: body.ownerId,
             type: body.type,
+            licenseNo: body.licenseNo,
+            owner: {
+                connect: { id: body.ownerId }
+            }
         }
     })
 

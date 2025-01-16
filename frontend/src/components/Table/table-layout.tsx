@@ -1,32 +1,67 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Table } from '../../types/table'
 import { TableItem } from './table-item'
 import { TableStatusDialog } from './table-status-dialog'
 import { Button } from '@/components/ui/button'
-
-const initialTables: Table[] = [
-  { id: 1, number: 1, status: 'empty', capacity: 2 },
-  { id: 2, number: 2, status: 'occupied', capacity: 4 },
-  { id: 3, number: 3, status: 'reserved', capacity: 6 },
-  { id: 4, number: 4, status: 'empty', capacity: 2 },
-  { id: 5, number: 5, status: 'occupied', capacity: 4 },
-  { id: 6, number: 6, status: 'empty', capacity: 6 },
-  { id: 7, number: 7, status: 'reserved', capacity: 8 },
-  { id: 8, number: 8, status: 'empty', capacity: 4 },
-]
+import { decodeJwtToUserid } from '@/hooks/decode'
+import axios from 'axios'
+import { BACKEND_URL } from '@/config'
 
 export function TableLayout() {
-  const [tables, setTables] = useState<Table[]>(initialTables)
+  const [restroName, setrestroName] = useState<string>("")
+  const [loading, setLoading] = useState(true)
+  const [tables, setTables] = useState<Table[]>([])
   const [selectedTable, setSelectedTable] = useState<Table | null>(null)
   const [capacityFilter, setCapacityFilter] = useState<number | null>(null)
 
-  const handleTableUpdate = (tableId: number, update: Partial<Table>) => {
-    setTables(tables.map(table => 
-      table.id === tableId ? { ...table, ...update } : table
-    ))
+  const fetchTables = async (decoded: string) => {
+    // try {
+    const response = await axios.get(`${BACKEND_URL}/api/v1/table/get/${decoded}`)
+    console.log("REs", response);
+    console.log("Res Name", response.data.tables.restaurants[0].name);
+
+    setrestroName(response.data.tables.restaurants[0].name);
+    setTables(response.data.tables.restaurants[0].tables);
+
+    // } catch (error) {
+    //   console.log('Error fetching tables:', error);
+    // } finally {
+    //   setLoading(false);
+    // }
+  }
+
+  const jwt = localStorage.getItem('token');
+  if (!jwt) {
+    window.location.href = '/signin';
+  }
+  const decoded = jwt ? decodeJwtToUserid(jwt) : null;
+
+  useEffect(() => {
+    if (decoded) {
+      fetchTables(decoded).finally(() => setLoading(false));
+    }
+  }, [decoded]);
+
+
+  // if (decoded) {
+  //   const intervalId = setInterval(() => {
+  //     fetchTables(decoded)
+  //   }, 6000) // 60000 ms = 1 minute
+  //   return () => clearInterval(intervalId)
+  // }
+
+  const handleTableUpdate = async (tableId: number, update: Partial<Table>) => {
+    // setTables(tables.map(table =>
+    //   table.id === tableId ? { ...table, ...update } : table
+    // ))
+    axios.put(`${BACKEND_URL}/api/v1/table/update`, { id: tableId, ...update })
     setSelectedTable(null)
+
+    if (decoded) {
+      setTimeout(() => fetchTables(decoded), 1000)
+    }
   }
 
   const filteredTables = capacityFilter
@@ -35,41 +70,61 @@ export function TableLayout() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
-        <Button 
-          variant={capacityFilter === null ? "default" : "outline"}
-          className={capacityFilter === null ? "bg-primary" : "hover:bg-primary/10"}
-          onClick={() => setCapacityFilter(null)}
-        >
-          All
-        </Button>
-        {[1, 2, 4, 6, 8].map(capacity => (
-          <Button
-            key={capacity}
-            variant={capacityFilter === capacity ? "default" : "outline"}
-            className={capacityFilter === capacity ? "bg-primary" : "hover:bg-primary/10"}
-            onClick={() => setCapacityFilter(capacity)}
-          >
-            {capacity}
-          </Button>
-        ))}
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {filteredTables.map(table => (
-          <TableItem 
-            key={table.id} 
-            table={table} 
-            onStatusChange={() => setSelectedTable(table)}
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <>
+          <div className='text-xl font-semibold mb-4'>{restroName}</div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={capacityFilter === null ? "default" : "outline"}
+              className={capacityFilter === null ? "bg-primary" : "hover:bg-primary/10"}
+              onClick={() => setCapacityFilter(null)}
+            >
+              All
+            </Button>
+            {[1, 2, 4, 6, 8].map(capacity => (
+              <Button
+                key={capacity}
+                variant={capacityFilter === capacity ? "default" : "outline"}
+                className={capacityFilter === capacity ? "bg-primary" : "hover:bg-primary/10"}
+                onClick={() => setCapacityFilter(capacity)}
+              >
+                {capacity}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              className="hover:bg-primary/10"
+              onClick={() => {
+                if (decoded) {
+                  fetchTables(decoded)
+                }
+                setCapacityFilter(null)
+              }}
+            >
+              Refresh
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {filteredTables
+              .sort((a, b) => a.id - b.id)
+              .map(table => (
+                <TableItem
+                  key={table.id}
+                  table={table}
+                  onStatusChange={() => setSelectedTable(table)}
+                />
+              ))}
+          </div>
+          <TableStatusDialog
+            table={selectedTable}
+            onTableUpdate={handleTableUpdate}
+            open={!!selectedTable}
+            onOpenChange={() => setSelectedTable(null)}
           />
-        ))}
-      </div>
-      <TableStatusDialog
-        table={selectedTable}
-        onTableUpdate={handleTableUpdate}
-        open={!!selectedTable}
-        onOpenChange={() => setSelectedTable(null)}
-      />
+        </>
+      )}
     </div>
   )
 }
-

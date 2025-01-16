@@ -3,20 +3,23 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from 'lucide-react'
+import { CountryDropdown } from "../ui/country-dropdown"
 
 interface RestaurantDetailsFormProps {
   formData: {
     restaurantName: string;
     restaurantPhone: string;
     address: string;
+    country: string;
     type: string;
+    licenseNo: string;
   };
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onBack: () => void;
   isLoading: boolean;
 }
 
-export function RestaurantDetailsForm({ formData, onChange, onBack, isLoading }: RestaurantDetailsFormProps) {
+export function RestaurantDetailsForm({ formData, onChange, isLoading }: RestaurantDetailsFormProps) {
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold mb-4">Step 2: Restaurant Details</h2>
@@ -52,6 +55,14 @@ export function RestaurantDetailsForm({ formData, onChange, onBack, isLoading }:
         />
       </div>
       <div className="space-y-2">
+        <Label htmlFor="type">Country</Label>
+        <CountryDropdown
+          placeholder="Select country"
+          defaultValue="IND"
+          onChange={(country) => onChange({ target: { name: 'country', value: country.name } } as any)}
+        />
+      </div>
+      <div className="space-y-2">
         <Label htmlFor="type">Type</Label>
         <Select name="type" value={formData.type} onValueChange={(value) => onChange({ target: { name: 'type', value } } as any)} required>
           <SelectTrigger>
@@ -64,10 +75,17 @@ export function RestaurantDetailsForm({ formData, onChange, onBack, isLoading }:
           </SelectContent>
         </Select>
       </div>
-      <div className="flex space-x-4">
-        <Button onClick={onBack} variant="outline" className="w-full" disabled={isLoading}>
-          Back
-        </Button>
+      <div className="space-y-2">
+        <Label htmlFor="licenseNo">Licence No (GST)</Label>
+        <Input
+          id="licenseNo"
+          name="licenseNo"
+          value={formData.licenseNo}
+          onChange={onChange}
+          required
+        />
+      </div>
+      <div className="flex space-x-4 pt-4">
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? (
             <>

@@ -15,6 +15,7 @@ import { jwtDecrypt } from "jose";
 import { JWT_SECRET } from "./config";
 import { ProtectedRoute } from "./components/ProtectedRoutes"
 import { OwnerDashboard } from "./pages/OwnerDashboard"
+import TableOrderPrompt from "./components/TableOrderPage/TableOrderPrompt"
 
 interface DecodedToken {
   userId: number;
@@ -58,6 +59,7 @@ function App() {
           <Route path='/table' element={<TableManagement />}></Route>
           <Route path='/edittable' element={<AdminTablePage />}></Route>
           <Route path='/dashboard' element={<ProtectedRoute> <OwnerDashboard /> </ProtectedRoute>}></Route>
+          <Route path='/torder/:tableId' element={<TableOrderPrompt />}></Route>
         </Routes>
       </BrowserRouter>
     </>

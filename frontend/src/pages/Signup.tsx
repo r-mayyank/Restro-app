@@ -10,9 +10,11 @@ import { ProgressBar } from '../components/Signup/ProgressBar'
 import { AnimatedFormContainer } from '../components/Signup/AnimatedFormContainer'
 import { Loader2 } from 'lucide-react'
 import { BACKEND_URL } from "../config";
+import { useNavigate } from 'react-router-dom'
 
 
 export default function SignupForm() {
+  const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     name: '',
@@ -23,6 +25,8 @@ export default function SignupForm() {
     restaurantPhone: '',
     address: '',
     type: '',
+    country: 'India',
+    licenseNo: ''
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -68,6 +72,8 @@ export default function SignupForm() {
         phoneNo: formData.restaurantPhone,
         address: formData.address,
         type: formData.type,
+        country: formData.country,
+        licenseNo: formData.licenseNo,
       })
 
       setSuccess(true)
@@ -89,11 +95,6 @@ export default function SignupForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     await createRestaurant()
-  }
-
-  const handleManageRestaurant = () => {
-    // This function would typically navigate to the restaurant management page
-    console.log("Navigating to restaurant management page")
   }
 
   return (
@@ -136,7 +137,7 @@ export default function SignupForm() {
               <div className="text-center text-green-600">
                 Signup successful! Your user ID is: {userId}
               </div>
-              <Button onClick={handleManageRestaurant} className="w-full">
+              <Button onClick={() => navigate("/dashboard")} className="w-full">
                 Manage Your Restaurant
               </Button>
             </div>

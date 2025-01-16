@@ -1,8 +1,10 @@
 import { TopBar } from "@/components/TopBar"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Grid, DollarSign, Utensils } from 'lucide-react'
+import { useNavigate } from "react-router-dom"
 
 export function OwnerDashboard() {
+    const navigate = useNavigate()
     return (
         <div>
             <TopBar />
@@ -16,8 +18,8 @@ export function OwnerDashboard() {
                     <CardContent>
                         <div className="text-2xl font-bold">25</div>
                     </CardContent>
-                    <CardFooter className="flex flex-row bg-blue-600 rounded-b-lg items-center justify-between space-y-0 pt-3">
-                        <div className="text-base font-medium text-white">Manage Employees→</div>
+                    <CardFooter onClick={() => navigate("/users")} className="flex flex-row bg-blue-600 rounded-b-lg items-center justify-between space-y-0 pt-3">
+                        <div className="text-base font-medium text-white cursor-pointer">Manage Employees→</div>
                     </CardFooter>
                 </Card>
                 <Card>
@@ -28,8 +30,8 @@ export function OwnerDashboard() {
                     <CardContent>
                         <div className="text-2xl font-bold">15</div>
                     </CardContent>
-                    <CardFooter className="flex flex-row bg-blue-600 rounded-b-lg items-center justify-between space-y-0 pt-3">
-                        <div className="text-base font-medium text-white">Manage Tables</div>
+                    <CardFooter onClick={() => navigate("/edittable")} className="flex flex-row bg-blue-600 rounded-b-lg items-center justify-between space-y-0 pt-3">
+                        <div className="text-base font-medium text-white cursor-pointer">Manage Tables→</div>
                     </CardFooter>
                 </Card>
                 <Card>
@@ -40,8 +42,8 @@ export function OwnerDashboard() {
                     <CardContent>
                         <div className="text-2xl font-bold">$1,234</div>
                     </CardContent>
-                    <CardFooter className="flex flex-row bg-blue-600 rounded-b-lg items-center justify-between space-y-0 pt-3">
-                        <div className="text-base font-medium text-white">Check analytics →</div>
+                    <CardFooter onClick={() => navigate("/users")} className="flex flex-row bg-blue-600 rounded-b-lg items-center justify-between space-y-0 pt-3">
+                        <div className="text-base font-medium text-white cursor-pointer">Check analytics →</div>
                     </CardFooter>
                 </Card>
                 <Card>
@@ -52,8 +54,8 @@ export function OwnerDashboard() {
                     <CardContent>
                         <div className="text-2xl font-bold">7</div>
                     </CardContent>
-                    <CardFooter className="flex flex-row bg-blue-600 rounded-b-lg items-center justify-between space-y-0 pt-3">
-                        <div className="text-base font-medium text-white">Manage orders →</div>
+                    <CardFooter onClick={() => navigate("/users")} className="flex flex-row bg-blue-600 rounded-b-lg items-center justify-between space-y-0 pt-3">
+                        <div className="text-base font-medium text-white cursor-pointer">Manage orders →</div>
                     </CardFooter>
                 </Card>
             </div>

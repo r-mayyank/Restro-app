@@ -33,7 +33,7 @@ export function TableStatusDialog({ table, onTableUpdate, open, onOpenChange }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Change Status for Table {table.number}</DialogTitle>
+          <DialogTitle>Change Status for Table {table.tno}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
